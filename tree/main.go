@@ -85,6 +85,32 @@ func LevelNode(t *Tree){
 		}
 	}
 }
+func (t *Tree)LevelNode(){
+	var (
+		front = -1
+		end = -1
+		list = make([]*Tree,20)
+		temp = *t
+	)
+	p := &temp
+	if p!=nil{
+		front ++
+		list[front] = p
+	}
+	for front != end{
+		end ++
+		p = list[end]
+		fmt.Print(fmt.Sprintf("%c",p.Value)," ")
+		if p.Left != nil{
+			front ++
+			list[front] = p.Left
+		}
+		if p.Right != nil{
+			front ++
+			list[front] = p.Right
+		}
+	}
+}
 //求深度
 func (t *Tree)Depth() int{
 	if t == nil{
@@ -114,7 +140,9 @@ func main(){
 	fmt.Println("\n后序遍历")
 	root.PostOrder()
 	fmt.Println("\n层次遍历")
-	LevelNode(root)
+	root.LevelNode()
+	//fmt.Println("\n按层次遍历")
+	//LevelNode(root)
 	//var q Quene
 	//if EmptyQueue(&q){
 	//	InitQueue(&q)
