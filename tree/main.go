@@ -55,7 +55,7 @@ func (t *Tree) PostOrder(){
 //构造树
 func BuildTree() *Tree{
 	//fmt.Println(fmt.Sprintf("%c",list[index]),"   ",index)
-	if list[index] == uint8('*'){
+	if list[index] == '*'{
 		index ++
 		return nil
 	}
@@ -74,7 +74,7 @@ func LevelNode(t *Tree){
 	if t!=nil{
 		EnQueue(&q,t)
 	}
-	for ;!EmptyQueue(&q);{
+	for ;!EmptyQueue(&q); {
 		DeQueue(&q,t)
 		fmt.Print(fmt.Sprintf("%c",t.Value)," ")
 		if t.Left != nil{
@@ -86,13 +86,23 @@ func LevelNode(t *Tree){
 	}
 }
 //求深度
-func (t *Tree)Depth()int{
+func (t *Tree)Depth() int{
 	if t == nil{
 		return 0
 	}
 	depthLeft := t.Left.Depth()
 	depthRight := t.Right.Depth()
 	return int(1 + math.Max(float64(depthLeft), float64(depthRight)))
+}
+//求左子叶的和
+func (t *Tree)SumOfLeftLeaves() (s uint8){
+	if t == nil{
+		return 0
+	}
+	if t.Left!= nil && t.Left.Left==nil && t.Left.Right== nil {
+		s = t.Left.Value
+	}
+	return s + t.Left.SumOfLeftLeaves() + t.Right.SumOfLeftLeaves()
 }
 
 func main(){

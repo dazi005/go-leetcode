@@ -1,91 +1,110 @@
 package main
 
+import "fmt"
 
-func FindMinSubString(s1 *[]byte,s2 *[]byte) {
-	hash_table := [256]int{}
+func minString(s string, t string) string {
+	//如果有空字符串，或者t大于s的话，就直接返回空了
+	if s == "" || t == "" || len(s) < len(t) {
+		return ""
+	}
 	/*
-		初始化 hash 表,s2中出现的字符标记为0,
-		其他标记为负数
+		创建int切片，因为处理的是英文字符串，在ascii码中，不会超过128，所以最大长度就128
 	*/
-	for i:=0; i < 256; i++{
-		hash_table[i] = -1;
+	need := make([]int, 128) //是t中有的
+	have := make([]int, 128) //是s中有的
+	//记录t中字符出现的次数
+	for i := 0; i < len(t); i++ {
+		//假设t中有一个A字符，A的ASCII码是67，那么need[67]就加一变成1
+		need[t[i]]++
 	}
-	for (p := s2; *p != '\0'; p++){
-	hash_table[*p] = 0;
+	var (
+		//刚开始的时候左右指针都是0，宽度只有1，然后后面慢慢扩大
+		left  = 0          // 窗口左指针
+		right = 0          // 窗口右指针
+		min   = len(s) + 1 // 最小长度（初始值一定为不可达长度）
+		count = 0          // 已有字符串中目标字符串出现的总频次，这里主要是为了省去比较的步骤
+		start = 0          // 最小覆盖子串在原字符串中的启始位置
+	)
+	//只要没有到s的尾巴，循环就一直执行
+	for right < len(s) {
+		r := s[right] //把右指针取出来
+		/*
+			在need数组中找不到，说明该字符不被目标字符所需要，就把窗口向右扩大一些
+			有可能是下面两种情况
+			1.循环刚开始，这个时候直接向右移动指针即可，不需要做多余判断
+			2.循环已经开始一段时间，此处有两种情况
+				1.上一次循环条件不满足（上一次也没有找到），这个时候说明现在限定的区间还是不太够，所以往右扩展一个
+				2.左指着你已经移动完毕，那么此时就相当于循环刚开始，直接移动右指针
+		*/
+		if need[r] == 0 {
+			right++
+			continue
+		}
+		/*
+			如果能走到这里说明至少右边的这个字符是符合要求的，只有出现的次数小于目标字符出现的次数的时候才会+1
+			这个是为了判断已有字符串是否已经包含了目标字符串的所有字符，不需要挨个比对每个字符出现的次数
+
+			need里面都是1，have只要之前已经统计过，have就是1，就不符合这里的cont++的条件，所以cont++是统计的第一次出现的
+			已经统计过的就不算在里面了
+		*/
+		if have[r] < need[r] {
+			count++
+		}
+		//把已经出现的给统计下来，这个have相当于记录当前窗口的功能
+		have[r]++
+		//不管是不是在need中的，right都向右来一个
+		right++
+		/*
+			下面的循环的意思是当找到了一个包含t的区间的时候就开始从左边缩小，知道找到最小子串
+
+			只有已有字符串已经包含了所有目标字符串（t）中的字符，且出现的频次一定大于或者等于指定的频次
+			count只有第一次出现的时候才会被++，因此count只要变得和t的长度一致，就代表已经找到了我们要找的
+			这里会一直进行寻找
+		*/
+		for count == len(t) {
+			/*
+				找到了一个合适的子串之后就要开始看看它是不是最小的了。如果是最小的，那么就把start标记为现在的左指针，
+				最小长度变成现在的最小长度，如果不是最小的就不做标记了
+			*/
+			if right-left < min {
+				min = right - left
+				start = left
+			}
+			//如果左边即将要去掉的字符不被目标字符串需要，那么不需要多余判断，直接可以移动左指针
+			l := s[left]
+			if need[l] == 0 {
+				left++
+				continue
+			}
+			/*
+				如果左边即将要去掉的字符被目标字符串需要，并且出现的频次正好等于指定频次，那么如果去掉了这个此符，
+				就不满足覆盖子串的条件，此时就要破坏循环条件，跳出循环（主要目的是为了控制目标字符串中的字符出现的总次数），
+
+				因为这个左边的字符要去掉，我们再找下一个子串，去掉了一个符合要求的，那么count肯定也应该 --
+				count--之后就不符合本次循环的条件了，所以退出循环，左指针右移
+
+				如果左边的字符不是在t中的，那么直接向左移就可以了
+
+				只要这里一执行，循环就结束了
+			*/
+			if have[l] == need[l] {
+				count--
+			}
+			//把这个left从滑动窗口中剔除
+			have[l]--
+			//左移一个
+			left++
+		}
+
 	}
-	char* p1 = s1;
-	char* p2 = s1;
-
-//最短长度
-int min_len = 2100000000;
-
-//最小串的起止位置
-char* min_p1 = s1;
-char* min_p2 = s1;
-
-//记录p1 p2之间的合法字符种类数 ,count == s2_len 包含s2
-int count = 0;
-
-int s2_len = strlen(s2);
-
-/*
-	注意p2到达s1的结束位置后，不能结束
-	应当继续收缩，直到不含s2
-*/
-while(*p2 !='\0' || s2_len==count)
-{
-
-//p1...p2不包含s2
-if (count<s2_len)
-{
-//属于s2中出现的字符
-if (hash_table[*p2] == 0)
-{
-count++;
-hash_table[*p2]++;
-}
-else if (hash_table[*p2] > 0)
-{
-hash_table[*p2]++;
+	//如果最小长度还是初始值，说明中间根本没有找到合适的（min的值只有在找到了包含t的窗口的时候才有用）
+	if min == len(s)+1 {
+		return ""
+	}
+	//返回最小字符串
+	return s[start : start+min]
 }
 
-p2++;
-}
-
-//不能用else 因为在上一个if语句中对count++;
-if(count == s2_len)
-{
-if (p2-p1 < min_len)
-{
-min_p1 = p1;
-min_p2 = p2;
-min_len = p2-p1;
-}
-
-//收缩
-hash_table[*p1]--;
-if (hash_table[*p1] == 0)
-{
-count--;
-}
-p1++;
-}
-}
-
-//输出
-while(min_p1 < min_p2)
-{
-cout<<*min_p1;
-min_p1++;
-}
-cout<<endl;
-
-return min_len;
-}
-int main()
-{
-char str1[]="abdddcaabc";
-char str2[]="abc";
-cout<<FindMinSubString(str1,str2);
-
+func main() {
+	fmt.Println(minString("ADOBECODEBANC", "ABC"))
 }

@@ -50,37 +50,33 @@ func QuickSort(values []int) {
 	quickSort(values, 0, len(values)-1)
 }
 
-func suitableIndex(list []int, start int, end int, current int) int {
-	// 比到最后美的比的时候就去对比下当前位置与待排元素的大小，并返回较大值的位置
-	if start >= end {
-		if list[start] < list[current] {
-			return current
-		} else {
-			return start
+func erfen(arr []int) {
+	for i := 1; i < len(arr); i++ {
+		temp := arr[i]
+		low := 0
+		high := i - 1
+		mid := -1 //中间位置
+		for low <= high {
+			mid = (low + high) / 2
+			if temp < arr[mid] {
+				high = mid - 1
+			} else {
+				low = mid + 1
+			}
+		}
+		for j := i - 1; j >= low; j-- {
+			arr[j+1] = arr[j]
+		}
+		if low != i {
+			arr[low] = temp
 		}
 	}
-	center := (end-start)/2 + start
-	// 如果中间的元素比较大，就继续向左侧寻找。反之则向右
-	if list[center] > list[current] {
-		return suitableIndex(list, start, center, current)
-	} else {
-		return suitableIndex(list, center+1, end, current)
-	}
-
 }
 
-func ErFen(list []int){
-	for i := 1; i < len(list); i++ {
-		// 利用二分查找，在待排元素左侧找到合适的插入位置
-		p := suitableIndex(list, 0, i-1, i)
-		// 如果最合适的位置不是待排元素当前位置，那就一次把合适位置后的元素都向后移动一位
-		if p != i {
-			temp := list[i]
-			for j := i; j > p; j-- {
-				list[j], list[j-1] = list[j-1], list[j]
-			}
-			list[p] = temp
-		}
-		fmt.Println(list)
-	}
+func main() {
+	arr := []int{9, 4, 8, 6, 4, 9, 6, 7, 8}
+	// bubbleSort(arr)
+	// fmt.Println(arr)
+	erfen(arr)
+	fmt.Println(arr)
 }

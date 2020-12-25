@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Quene struct {
 	Front int
 	End int
@@ -40,18 +38,4 @@ func DeQueue(q *Quene,t *Tree) bool{
 func InitQueue(q *Quene){
 	q.Front = -1
 	q.End = -1
-}
-
-func main1(){
-	var q  Quene
-	EmptyQueue(&q)
-	tree := Tree{
-		Value: 1,
-		Left: nil,
-		Right: nil,
-	}
-	tree2 := Tree{}
-	EnQueue(&q,&tree)
-	DeQueue(&q,&tree2)
-	fmt.Println(tree2.Value)
 }

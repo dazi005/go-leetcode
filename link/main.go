@@ -1,4 +1,5 @@
 package main
+
 type ListNode struct {
 	Val int
     Next *ListNode
@@ -20,7 +21,6 @@ func deleteNode(head *ListNode, val int) *ListNode {
 
 	return dummy.Next
 }
-
 //判断是否有环
 func detectCycle(head *ListNode) *ListNode {
 	if head == nil || head.Next == nil {
@@ -36,6 +36,9 @@ func detectCycle(head *ListNode) *ListNode {
 	}
 	return nil
 }
+
+
+
 func main(){
 
 }
