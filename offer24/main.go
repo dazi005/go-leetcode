@@ -6,23 +6,12 @@ type ListNode struct {
      Next *ListNode
  }
 func reverseList(head *ListNode) *ListNode {
-	tempHead := &ListNode{}
-	beforeNode := new(ListNode)
-	tempArr := []int{}
-	for ;head.Next != nil;{
-		tempArr = append(tempArr,head.Val)
+	var pre *ListNode
+	for head != nil{
+		node := head.Next
+		head.Next = pre
+		pre = head
+		head = node
 	}
-	for i := len(tempArr);i >= 0;i++ {
-		nowNode := new(ListNode)
-		nowNode.Val = tempArr[i]
-		nowNode.Next = nil
-		if i == len(tempArr){
-			tempHead = nowNode
-			beforeNode = nowNode
-		}else {
-			beforeNode.Next = nowNode
-			beforeNode = nowNode
-		}
-	}
-	return tempHead
+	return pre
 }
