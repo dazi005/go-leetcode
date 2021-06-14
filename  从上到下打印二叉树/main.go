@@ -20,7 +20,7 @@ func dfs(index int, root *TreeNode, arr [][]int){
 		return
 	}
 	if len(arr) - 1 < index {
-		arr = append(arr, []int)
+		arr = append(arr, []int{})
 	}
 	arr[index] = append(arr[index], root.Val)
 	index ++
